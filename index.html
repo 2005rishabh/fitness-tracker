@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fitness Tracker</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="bg-gray-100 text-gray-900 transition-colors duration-300">
+  <header class="bg-blue-600 text-white p-4 shadow-md">
+    <div class="max-w-3xl mx-auto flex justify-between items-center">
+      <h1 class="text-2xl font-bold">College Fitness Tracker</h1>
+      <nav class="flex items-center">
+        <span id="userGreeting" class="mr-4 hidden"></span>
+        <a href="profile.html" id="profileLink" class="text-white hover:underline mx-2 hidden">Profile</a>
+        <a href="login.html" id="loginLink" class="text-white hover:underline mx-2">Login</a>
+        <a href="signup.html" id="signupLink" class="text-white hover:underline mx-2">Sign Up</a>
+        <button id="logoutBtn" class="text-white hover:underline mx-2 hidden">Logout</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="p-6 max-w-3xl mx-auto">
+    <section class="mb-6">
+      <h2 class="text-xl font-semibold mb-2">Log Workout</h2>
+      <form id="workoutForm" class="space-y-4">
+        <div>
+          <label class="block mb-1 font-medium" for="exercise">Exercise</label>
+          <input type="text" id="exercise" class="w-full p-2 border rounded-md" required />
+        </div>
+        <div>
+          <label class="block mb-1 font-medium" for="duration">Duration (minutes)</label>
+          <input type="number" id="duration" class="w-full p-2 border rounded-md" required />
+        </div>
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add Workout</button>
+      </form>
+    </section>
+
+    <section>
+      <h2 class="text-xl font-semibold mb-2">Workout Log</h2>
+      <ul id="workoutList" class="space-y-2">
+        <!-- Workouts will be appended here -->
+      </ul>
+    </section>
+
+    <section id="summary" class="mt-8 hidden">
+      <h2 class="text-xl font-semibold mb-4">Workout Summary</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="bg-white p-4 rounded shadow text-center">
+          <p class="text-lg font-semibold">Total Workouts</p>
+          <p id="totalWorkouts" class="text-2xl font-bold text-blue-600">0</p>
+        </div>
+        <div class="bg-white p-4 rounded shadow text-center">
+          <p class="text-lg font-semibold">Total Duration</p>
+          <p id="totalDuration" class="text-2xl font-bold text-green-600">0</p>
+          <p class="text-sm text-gray-600">minutes</p>
+        </div>
+        <div class="bg-white p-4 rounded shadow text-center">
+          <p class="text-lg font-semibold">Average Duration</p>
+          <p id="averageDuration" class="text-2xl font-bold text-yellow-600">0</p>
+          <p class="text-sm text-gray-600">minutes</p>
+        </div>
+        <div class="bg-white p-4 rounded shadow text-center">
+          <p class="text-lg font-semibold">Workout Streak</p>
+          <p id="workoutStreak" class="text-2xl font-bold text-pink-600">0</p>
+          <p class="text-sm text-gray-600">days</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const userGreeting = document.getElementById('userGreeting');
+    const loginLink = document.getElementById('loginLink');
+    const signupLink = document.getElementById('signupLink');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const profileLink = document.getElementById('profileLink');
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    const form = document.getElementById('workoutForm');
+    const workoutList = document.getElementById('workoutList');
+    const totalWorkoutsEl = document.getElementById('totalWorkouts');
+    const totalDurationEl = document.getElementById('totalDuration');
+    const averageDurationEl = document.getElementById('averageDuration');
+    const workoutStreakEl = document.getElementById('workoutStreak');
+    const summarySection = document.getElementById('summary');
+
+    let workouts = JSON.parse(localStorage.getItem('workouts')) || [];
+
+    if (user) {
+      userGreeting.textContent = `Welcome, ${user.name}`;
+      userGreeting.classList.remove('hidden');
+      logoutBtn.classList.remove('hidden');
+      loginLink.classList.add('hidden');
+      signupLink.classList.add('hidden');
+      profileLink.classList.remove('hidden');
+      summarySection.classList.remove('hidden');
+      renderWorkouts();
+    } else {
+      alert('Please login to access the workout tracker.');
+      window.location.href = 'login.html';
+    }
+
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem('user');
+      alert('You have been logged out.');
+      window.location.reload();
+    });
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const exercise = document.getElementById('exercise').value;
+      const duration = parseInt(document.getElementById('duration').value);
+      const date = new Date().toLocaleDateString();
+
+      const workout = { exercise, duration, date };
+      workouts.push(workout);
+      localStorage.setItem('workouts', JSON.stringify(workouts));
+      renderWorkouts();
+      form.reset();
+
+      if (workouts.length % 3 === 0) {
+        alert('Great job! You have logged 3 workouts! 💪');
+      }
+    });
+
+    function renderWorkouts() {
+      workoutList.innerHTML = '';
+      let totalDuration = 0;
+      let workoutDates = new Set();
+
+      workouts.forEach(w => {
+        const li = document.createElement('li');
+        li.className = 'bg-white p-4 rounded shadow';
+        li.textContent = `${w.date}: ${w.exercise} - ${w.duration} min`;
+        workoutList.appendChild(li);
+        totalDuration += w.duration;
+        workoutDates.add(w.date);
+      });
+
+      const totalWorkouts = workouts.length;
+      const averageDuration = totalWorkouts ? (totalDuration / totalWorkouts).toFixed(1) : 0;
+
+      totalWorkoutsEl.textContent = totalWorkouts;
+      totalDurationEl.textContent = totalDuration;
+      averageDurationEl.textContent = averageDuration;
+      workoutStreakEl.textContent = workoutDates.size;
+    }
+  </script>
+</body>
+
+</html>

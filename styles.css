@@ -1,0 +1,16 @@
+/* styles.css */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  input, button {
+    transition: all 0.2s ease-in-out;
+  }
+  
+  input:focus {
+    outline: none;
+    border-color: #2563eb; /* Tailwind blue-600 */
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+  }
+  

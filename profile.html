@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile - Fitness Tracker</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="bg-gradient-to-br from-blue-50 to-gray-100 text-gray-900 min-h-screen">
+  <header class="bg-blue-600 text-white p-4 shadow-md">
+    <div class="max-w-4xl mx-auto flex justify-between items-center">
+      <h1 class="text-2xl font-bold">🏋️ College Fitness Tracker</h1>
+      <nav class="flex items-center">
+        <a href="index.html" class="text-white hover:underline mx-2">Home</a>
+        <button id="logoutBtn" class="text-white hover:underline mx-2 hidden">Logout</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="p-6 max-w-4xl mx-auto">
+    <h2 class="text-3xl font-bold text-center mb-6 text-blue-700">Your Profile</h2>
+    <div class="bg-white rounded-2xl shadow-lg p-8 space-y-6 border border-gray-200">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label class="text-lg font-semibold text-gray-700 mb-2 block">👤 Name:</label>
+          <input id="userName" class="text-xl font-medium text-gray-800 w-full border rounded p-2" readonly />
+        </div>
+        <div>
+          <label class="text-lg font-semibold text-gray-700 mb-2 block">📧 Email:</label>
+          <input id="userEmail" class="text-xl font-medium text-gray-800 w-full border rounded p-2" readonly />
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-blue-50 p-4 rounded-lg text-center shadow">
+          <p class="text-lg text-gray-600">Total Workouts</p>
+          <p id="totalWorkouts" class="text-3xl font-bold text-blue-600">0</p>
+        </div>
+        <div class="bg-green-50 p-4 rounded-lg text-center shadow">
+          <p class="text-lg text-gray-600">Total Duration</p>
+          <p><span id="totalDuration" class="text-3xl font-bold text-green-600">0</span> <span class="text-lg">minutes</span></p>
+        </div>
+      </div>
+      <div class="flex justify-center space-x-4">
+        <button id="editProfileBtn" class="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded-lg text-lg shadow-md">Edit</button>
+        <button id="saveProfileBtn" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg text-lg shadow-md hidden">Save</button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const user = JSON.parse(localStorage.getItem('user'));
+    const workouts = JSON.parse(localStorage.getItem('workouts')) || [];
+
+    const userName = document.getElementById('userName');
+    const userEmail = document.getElementById('userEmail');
+    const totalWorkouts = document.getElementById('totalWorkouts');
+    const totalDuration = document.getElementById('totalDuration');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const editBtn = document.getElementById('editProfileBtn');
+    const saveBtn = document.getElementById('saveProfileBtn');
+
+    if (user) {
+      userName.value = user.name;
+      userEmail.value = user.email;
+      totalWorkouts.textContent = workouts.length;
+      totalDuration.textContent = workouts.reduce((sum, w) => sum + w.duration, 0);
+      logoutBtn.classList.remove('hidden');
+    } else {
+      alert('Please login to access your profile.');
+      window.location.href = 'login.html';
+    }
+
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem('user');
+      alert('You have been logged out.');
+      window.location.href = 'login.html';
+    });
+
+    editBtn.addEventListener('click', () => {
+      userName.removeAttribute('readonly');
+      userEmail.removeAttribute('readonly');
+      saveBtn.classList.remove('hidden');
+      editBtn.classList.add('hidden');
+    });
+
+    saveBtn.addEventListener('click', () => {
+      const updatedUser = {
+        name: userName.value.trim(),
+        email: userEmail.value.trim(),
+        password: user.password // preserve existing password
+      };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      alert('Profile updated successfully!');
+      userName.setAttribute('readonly', true);
+      userEmail.setAttribute('readonly', true);
+      saveBtn.classList.add('hidden');
+      editBtn.classList.remove('hidden');
+    });
+  </script>
+</body>
+
+</html>

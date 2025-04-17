@@ -16,7 +16,7 @@ A simple and stylish fitness tracking web application built with **HTML**, **CSS
 ---
 
 ## 📁 Project Structure
-
+<pre> <code>
 fitness-tracker/ 
 ├── index.html # Home page 
 ├── login.html # Login page 
@@ -26,7 +26,7 @@ fitness-tracker/
 ├── script.js # General JavaScript 
 ├── login.js # Login form logic 
 ├── signup.js # Signup form logic
-
+</code></pre>
 
 ---
 
